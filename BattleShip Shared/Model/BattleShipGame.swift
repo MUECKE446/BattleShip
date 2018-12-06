@@ -33,6 +33,7 @@ class Ship {
     var startFieldIndex:FieldIndex = (-1,-1)   // verändert sich beim Platzieren
     var direction = Direction.horizontal
     var placed = false
+    
     let length : Int
     
     init(length:Int) {
@@ -43,6 +44,8 @@ class Ship {
 class BattleShipGame {
     var ships:[Ship] = []
     
+    let gridSize : Int
+    
     var notSuitableFieldsGrid: [[Bool]] = []
     var gameGrid: [[Bool]] = []
     
@@ -52,6 +55,13 @@ class BattleShipGame {
     // Hilfsfelder dafür
     var possibleHorizontalStartIndices : [FieldIndex] = []
     var possibleVerticalStartIndices : [FieldIndex] = []
+
+    var occupiedFieldsInColumns:[Int] = []
+    var occupiedFieldsInRows:[Int] = []
+    
+    init(gridSize:Int) {
+        self.gridSize = gridSize
+    }
     
     // versucht ein Spiel zu erzeugen
     func createGame() {
@@ -59,12 +69,14 @@ class BattleShipGame {
         // solange versuchen, bis es klappt
         while !setShipsToGameGrid() {
         }
+        occupiedFieldsInRows = calculateOccupiedFieldsInRows()
+        occupiedFieldsInColumns = calculateOccupiedFieldsInColumns()
     }
     
     func createPossibleStartFieldGrid(ship:Ship,direction:Direction) -> [[Bool]] {
-        var tmpField = Array(repeating: Array(repeating: true, count: kGridSize), count: kGridSize)
-        for row in 0..<kGridSize {
-            for col in 0..<kGridSize {
+        var tmpField = Array(repeating: Array(repeating: true, count: gridSize), count: gridSize)
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
                 // alle berlegten Felder aus notSuitableFieldsGrid sind verbrannt
                 if notSuitableFieldsGrid[row][col] {
                     tmpField[row][col] = false
@@ -75,8 +87,8 @@ class BattleShipGame {
         // wie groß ist das Schiff
         let length = ship.length
         // noch mal jedes Feld untersuchen
-        for row in 0..<kGridSize {
-            for col in 0..<kGridSize {
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
                 // falls dieses Feld schon verbrannt ist -> nächstes untersuchen
                 if tmpField[row][col] == false {
                     continue
@@ -87,7 +99,7 @@ class BattleShipGame {
                 case .horizontal:
                     // prüfe, ob hier das Schiff horizontal hinpassen würde
                     for c in 0..<length {
-                        if col+c >= kGridSize {
+                        if col+c >= gridSize {
                             // ende des Spielfeldes erreicht
                             fits = false
                             break       // überprüfung fehlgeschlagen
@@ -107,7 +119,7 @@ class BattleShipGame {
                 case .vertical:
                     // prüfe, ob hier das Schiff vertikal hinpassen würde
                     for r in 0..<length {
-                        if row+r >= kGridSize {
+                        if row+r >= gridSize {
                             // ende des Spielfeldes erreicht
                             fits = false
                             break       // überprüfung fehlgeschlagen
@@ -159,8 +171,8 @@ class BattleShipGame {
         // für alle folgenden Versuche ein gültiges Spiel zu erzeugen, benötige ich Information, ob noch ein neuer Versuch gemacht werden kann
         // als Hilfe wird daraus gleich gebildet
         // erzeuge ein leeres Spielfeld
-        notSuitableFieldsGrid = Array(repeating: Array(repeating: false, count: kGridSize), count: kGridSize)
-        gameGrid = Array(repeating: Array(repeating: false, count: kGridSize), count: kGridSize)
+        notSuitableFieldsGrid = Array(repeating: Array(repeating: false, count: gridSize), count: gridSize)
+        gameGrid = Array(repeating: Array(repeating: false, count: gridSize), count: gridSize)
         
         // wähle ein StartField
         var direction = Direction.horizontal
@@ -255,7 +267,7 @@ class BattleShipGame {
         switch direction {
         case .horizontal:
             // kann das Schiff überhaupt platziert werden
-            if fieldIndex.column + (ship.length-1)  >= kGridSize {
+            if fieldIndex.column + (ship.length-1)  >= gridSize {
                 // das Schiff ist nicht plazierbar
                 return false
             }
@@ -264,7 +276,7 @@ class BattleShipGame {
                 left += 1
             }
             // ist rechts eine Spalte vorhanden
-            if fieldIndex.column + (ship.length-1) + 1 < kGridSize {
+            if fieldIndex.column + (ship.length-1) + 1 < gridSize {
                 right += 1
             }
             // ist eine Reihe oben vorhanden
@@ -272,7 +284,7 @@ class BattleShipGame {
                 up += 1
             }
             // ist eine Reihe unten vorhanden
-            if fieldIndex.row + 1 < kGridSize {
+            if fieldIndex.row + 1 < gridSize {
                 down += 1
             }
             let startRange = fieldIndex.column - left
@@ -292,7 +304,7 @@ class BattleShipGame {
             }
         case .vertical:
             // kann das Schiff überhaupt platziert werden
-            if fieldIndex.row + (ship.length-1)  >= kGridSize {
+            if fieldIndex.row + (ship.length-1)  >= gridSize {
                 // das Schiff ist nicht plazierbar
                 return false
             }
@@ -301,7 +313,7 @@ class BattleShipGame {
                 left += 1
             }
             // ist rechts eine Spalte vorhanden
-            if fieldIndex.column + 1 < kGridSize {
+            if fieldIndex.column + 1 < gridSize {
                 right += 1
             }
             // ist eine Reihe oben vorhanden
@@ -309,7 +321,7 @@ class BattleShipGame {
                 up += 1
             }
             // ist eine Reihe unten vorhanden
-            if fieldIndex.row + (ship.length-1) + 1 < kGridSize {
+            if fieldIndex.row + (ship.length-1) + 1 < gridSize {
                 down += 1
             }
             let startRange = fieldIndex.row - up
@@ -360,4 +372,35 @@ class BattleShipGame {
         }
     }
     
+    // berechne die Anzahl der belegten Felder (rows)
+    func calculateOccupiedFieldsInRows() -> [Int] {
+        var tmpArr:[Int] = []
+        var numberOccupied = 0
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
+                if gameGrid[row][col] {
+                    numberOccupied += 1
+                }
+            }
+            tmpArr.append(numberOccupied)
+            numberOccupied = 0
+        }
+        return tmpArr
+    }
+    
+    // berechne die Anzahl der belegten Felder (columns)
+    func calculateOccupiedFieldsInColumns() -> [Int] {
+        var tmpArr:[Int] = []
+        var numberOccupied = 0
+        for col in 0..<gridSize {
+            for row in 0..<gridSize {
+                if gameGrid[row][col] {
+                    numberOccupied += 1
+                }
+            }
+            tmpArr.append(numberOccupied)
+            numberOccupied = 0
+        }
+        return tmpArr
+    }
 }

@@ -13,7 +13,7 @@ import GameplayKit
 class GameViewController: UIViewController {
 
     var scene:GameScene? = nil
-    let battleShipGame = BattleShipGame()
+    let battleShipGame = BattleShipGame(gridSize: kGridSize)
     
     
     override func viewDidLoad() {
@@ -23,6 +23,7 @@ class GameViewController: UIViewController {
         // initialisiere die Scene
         JKGame.game.setOrientation(JKOrientation.portrait)
         scene = GameScene(size: JKGame.size)
+        scene?.gridSize = kGridSize
         //scene = GameScene(size: CGSize(width: 1536, height: 2048))
         let skView = self.view as! SKView
 
@@ -40,7 +41,8 @@ class GameViewController: UIViewController {
         activityIndicator.startAnimating()
         battleShipGame.createGame()
         activityIndicator.stopAnimating()
-        
+        scene!.showOccupiedFieldsInRowsAndColumns(game: battleShipGame)
+        scene!.showShipsInPlayField(game: battleShipGame)
         
     }
 

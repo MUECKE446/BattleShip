@@ -11,10 +11,11 @@ import SpriteKit
 
 extension GameScene {
 
-    class func createPlayField(gridSize:Int,withNumberLabels:Bool) -> SKSpriteNode {
+    func createPlayField(gridSize:Int,withNumberLabels:Bool) -> SKSpriteNode {
         // dies ist das Gitter, in dem gespielt wird
         // (0,0) oberstes linkes Feld
         let playField = SKSpriteNode()
+        playField.name = "PlayField"
         
         // da der ancorPoint bei default (0.5,0.5) liegt (was der Mittelpunkt der ersten SpriteNode ist) liegt die
         // untere Ecke bei (-40,-40)
@@ -31,7 +32,7 @@ extension GameScene {
                 let numberLabel = SKLabelNode(text: String(j))
                 numberLabel.fontColor = UIColor.darkText
                 numberLabel.fontName = "Helvetica"
-                numberLabel.fontSize = 22
+                numberLabel.fontSize = 28
                 let numberLabelName = "numberLabelUp " + String(j)
                 numberLabel.name = numberLabelName
                 numberLabel.position = playFieldPosition
@@ -50,7 +51,7 @@ extension GameScene {
                 let numberLabel = SKLabelNode(text: String((gridSize-1)-i))
                 numberLabel.fontColor = UIColor.darkText
                 numberLabel.fontName = "Helvetica"
-                numberLabel.fontSize = 22
+                numberLabel.fontSize = 28
                 let numberLabelName = "numberLabelLeft " + String((gridSize-1)-i)
                 numberLabel.name = numberLabelName
                 numberLabel.position = playFieldPosition
@@ -74,33 +75,105 @@ extension GameScene {
                 playFieldPiece.position = playFieldPosition
                 playField.addChild(playFieldPiece as SKNode)
                 // für den Test die Koordinaten einblenden
-                if true {
-                    let coordinatesText = String((gridSize-1)-i) + "," + String(j)
-                    let coordinateLabel = SKLabelNode(text: coordinatesText)
-                    coordinateLabel.fontColor = UIColor.darkText
-                    coordinateLabel.fontName = "Helvetica"
-                    coordinateLabel.fontSize = 22
-                    coordinateLabel.position = playFieldPosition
-                    coordinateLabel.verticalAlignmentMode = .center
-                    coordinateLabel.zPosition = playFieldPiece.zPosition + 1
-                    playField.addChild(coordinateLabel)
-                }
+//                let coordinatesText = String((gridSize-1)-i) + "," + String(j)
+//                let coordinateLabel = SKLabelNode(text: coordinatesText)
+//                coordinateLabel.fontColor = UIColor.darkText
+//                coordinateLabel.fontName = "Helvetica"
+//                coordinateLabel.fontSize = 22
+//                coordinateLabel.position = playFieldPosition
+//                coordinateLabel.verticalAlignmentMode = .center
+//                coordinateLabel.zPosition = playFieldPiece.zPosition + 1
+//                playField.addChild(coordinateLabel)
                 // ein Gitterfeld ist 80x80 Pixel groß; die umgebende Umrandung hat eine Linienstärke von 2 Pixeln
                 playFieldPosition.x += 76
             }
             playFieldPosition.x = 0
             playFieldPosition.y += 76
         }
-        
-//        backGroundLabel.position = CGPoint(x: -80, y: 0)
-//        let numberLabel = SKLabelNode(text: "1")
-////        numberLabel.position.x = -60
-////        numberLabel.position.y = -20
-//        
-//        numberLabel.fontColor = UIColor.black
-//        backGroundLabel.addChild(numberLabel)
-//        playField.addChild(backGroundLabel)
         return playField
     }
-
+    
+    func showShipsInPlayField(game:BattleShipGame) {
+        var playFieldNode = SKSpriteNode()
+        for node in self.children {
+            if node.name != nil {
+                if node.name == "PlayField" {
+                    playFieldNode = node as! SKSpriteNode
+                    break
+                }
+            }
+        }
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
+                let pieceName = "playField_part(" + String(row) + "," + String(col) + ")"
+                if game.gameGrid[row][col] {
+                    // ersetze das entsprechende Feld im playField
+                    for node in playFieldNode.children {
+                        if let nodeName = node.name {
+                            if nodeName == pieceName {
+                                let shipNode = SKSpriteNode(imageNamed: "playingField_80x80")
+                                shipNode.name = pieceName
+                                shipNode.position = node.position
+                                node.removeFromParent()
+                                playFieldNode.addChild(shipNode)
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func showOccupiedFieldsInRowsAndColumns(game:BattleShipGame) {
+        var found = false
+        for i in 0..<game.gridSize {
+            // finde numberLabel
+            found = false
+            for node in self.children {
+                if node.name != nil {
+                    if node.name == "PlayField" {
+                        for childNode in node.children {
+                            if let nodeName = childNode.name {
+                                if nodeName == "numberLabelUp " + String(i) {
+                                    // numberLabel  gefunden
+                                    let numberLabel = childNode as! SKLabelNode
+                                    numberLabel.text = String(game.occupiedFieldsInColumns[i])
+                                    found = true
+                                    break
+                                }
+                            }
+                        }
+                        if found {
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        for i in 0..<game.gridSize {
+            // finde numberLabel
+            found = false
+            for node in self.children {
+                if node.name != nil {
+                    if node.name == "PlayField" {
+                        for childNode in node.children {
+                            if let nodeName = childNode.name {
+                                if nodeName == "numberLabelLeft " + String(i) {
+                                    // numberLabel  gefunden
+                                    let numberLabel = childNode as! SKLabelNode
+                                    numberLabel.text = String(game.occupiedFieldsInRows[i])
+                                    found = true
+                                    break
+                                }
+                            }
+                        }
+                        if found {
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

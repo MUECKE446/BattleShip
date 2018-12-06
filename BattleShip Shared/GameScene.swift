@@ -8,14 +8,14 @@
 
 import SpriteKit
 
-class GameScene: SKScene {
+class GameScene : SKScene {
     
     
     var sceneCenter = CGPoint.zero
     
-    // erzeuge das Gitter, indem gespielt wird und platziere es bei origin
-    var playField = GameScene.createPlayField(gridSize: kGridSize, withNumberLabels: true)
-    
+    var playField = SKSpriteNode()
+    var gridSize = 0
+
     // Aktions
     var sequenceAction = SKAction()
     
@@ -24,11 +24,6 @@ class GameScene: SKScene {
     #if os(iOS)
     var panGestureRecognizer = UIPanGestureRecognizer()
     #endif
-    
-
-    
-    // ein internes Abbild des Spielfeldes; unbelegtes Feld = false, belegtes Feld = true
-    var blockGameField = Array(repeating: Array(repeating: false, count: kGridSize), count: kGridSize)
     
     override func didMove(to view: SKView) {
         /* Setup your scene here */
@@ -46,6 +41,7 @@ class GameScene: SKScene {
     }
     
     func createStartScene() {
+        playField = createPlayField(gridSize: gridSize, withNumberLabels: true)
         // das ist der Mittelpunkt der Scene
         sceneCenter = CGPoint(x: self.size.width/2, y: self.size.height/2)
         
