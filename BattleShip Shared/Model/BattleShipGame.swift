@@ -403,4 +403,27 @@ class BattleShipGame {
         }
         return tmpArr
     }
+    
+    func findShip(_ row:Int, _ columun:Int) -> Ship {
+        var tmpShip = Ship(length: 0)
+        
+        for ship in ships {
+            switch ship.direction {
+            case .horizontal:
+                let columnRange = ship.startFieldIndex.column..<ship.startFieldIndex.column+ship.length
+                if ship.startFieldIndex.row == row && columun >= columnRange.startIndex && columun <= columnRange.endIndex {
+                    tmpShip = ship
+                    break
+                }
+            case .vertical:
+                let rowRange = ship.startFieldIndex.row..<ship.startFieldIndex.row+ship.length
+                if ship.startFieldIndex.column == columun && row >= rowRange.startIndex && row <= rowRange.endIndex {
+                    tmpShip = ship
+                    break
+                }
+            }
+        }
+        return tmpShip
+    }
+    
 }

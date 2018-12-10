@@ -111,7 +111,26 @@ extension GameScene {
                     for node in playFieldNode.children {
                         if let nodeName = node.name {
                             if nodeName == pieceName {
-                                let shipNode = SKSpriteNode(imageNamed: "playingField_80x80")
+                                var shipNode = SKSpriteNode(imageNamed: "shipMiddle")
+                                let ship = game.findShip(row, col)
+                                switch ship.direction {
+                                case .horizontal:
+                                    if row == ship.startFieldIndex.row && col == ship.startFieldIndex.column {
+                                        shipNode = SKSpriteNode(imageNamed: "shipLeft")
+                                    }
+                                    if row == ship.startFieldIndex.row && col == ship.startFieldIndex.column+ship.length-1 {
+                                        shipNode = SKSpriteNode(imageNamed: "shipRight")
+                                    }
+                                    break
+                                case .vertical:
+                                    if col == ship.startFieldIndex.column && row == ship.startFieldIndex.row {
+                                        shipNode = SKSpriteNode(imageNamed: "shipUp")
+                                    }
+                                    if col == ship.startFieldIndex.column && row == ship.startFieldIndex.row+ship.length-1 {
+                                        shipNode = SKSpriteNode(imageNamed: "shipDown")
+                                    }
+                                    break
+                                }
                                 shipNode.name = pieceName
                                 shipNode.position = node.position
                                 node.removeFromParent()
