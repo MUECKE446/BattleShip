@@ -43,6 +43,7 @@ class GameViewController: UIViewController {
         activityIndicator.stopAnimating()
         scene!.showOccupiedFieldsInRowsAndColumns(game: battleShipGame)
         scene!.showShipsInPlayField(game: battleShipGame)
+        scene!.showUsedShipsInGame(battleShipGame)
         
     }
 
