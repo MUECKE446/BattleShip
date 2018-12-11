@@ -9,6 +9,11 @@
 import Foundation
 import SpriteKit
 
+struct ShipNode {
+    var nodes:[SKSpriteNode] = []
+    var lenght = -1
+}
+
 extension GameScene {
 
     func createPlayField(gridSize:Int,withNumberLabels:Bool) -> SKSpriteNode {
@@ -93,22 +98,15 @@ extension GameScene {
         return playField
     }
     
+    
+    
     func showShipsInPlayField(game:BattleShipGame) {
-        var playFieldNode = SKSpriteNode()
-        for node in self.children {
-            if node.name != nil {
-                if node.name == "PlayField" {
-                    playFieldNode = node as! SKSpriteNode
-                    break
-                }
-            }
-        }
         for row in 0..<gridSize {
             for col in 0..<gridSize {
                 let pieceName = "playField_part(" + String(row) + "," + String(col) + ")"
                 if game.gameGrid[row][col] {
                     // ersetze das entsprechende Feld im playField
-                    for node in playFieldNode.children {
+                    for node in playField.children {
                         if let nodeName = node.name {
                             if nodeName == pieceName {
                                 var shipNode = SKSpriteNode(imageNamed: "shipMiddle")
@@ -134,7 +132,7 @@ extension GameScene {
                                 shipNode.name = pieceName
                                 shipNode.position = node.position
                                 node.removeFromParent()
-                                playFieldNode.addChild(shipNode)
+                                playField.addChild(shipNode)
                                 break
                             }
                         }
@@ -195,4 +193,61 @@ extension GameScene {
             }
         }
     }
+    
+    func showUsedShipsInGame(_ game:BattleShipGame) {
+        var lastLength = game.ships.last?.length
+        var nextShipPosition = playField.position
+        let scale = CGFloat(0.7)
+        // Höhe einer Kachel + halbe Höhe
+        let testNode = SKSpriteNode(imageNamed: "shipPreviewMiddle")
+        let nodeHeight = testNode.size.height
+        nextShipPosition.y -= (nodeHeight + nodeHeight/2) * scale
+        
+        // zeige die Schiffe vom größtem zum kleinsten hin
+        for ship in game.ships.reversed() {
+            var shipNode = ShipNode()
+            let playFieldRect = playField.calculateAccumulatedFrame()
+            if lastLength != ship.length || (nextShipPosition.x + CGFloat(ship.length) * CGFloat(76.0 * scale) > playFieldRect.origin.x + playFieldRect.size.width) {
+                nextShipPosition.x = playField.position.x
+                nextShipPosition.y -= CGFloat((nodeHeight + nodeHeight/4) * scale)
+            }
+            var nextNodePosition = nextShipPosition
+            
+            shipNode.lenght = ship.length
+            // alle Schiffe werden hier horizontal angezeigt
+            // ersten Node hinzufügen
+            var node = SKSpriteNode(imageNamed: "shipPreviewLeft")
+            node.position = nextNodePosition
+            // im ersten Node wird die Länge angezeigt
+            let numberLabel = SKLabelNode(text: String(ship.length))
+            numberLabel.fontColor = UIColor.darkText
+            numberLabel.fontName = "Helvetica"
+            numberLabel.fontSize = 28
+            numberLabel.verticalAlignmentMode = .center
+            numberLabel.zPosition = node.zPosition + 1
+            node.addChild(numberLabel)
+            shipNode.nodes.append(node)
+            if ship.length > 2 {
+                for _ in 2...ship.length-1 {
+                    node = SKSpriteNode(imageNamed: "shipPreviewMiddle")
+                    nextNodePosition.x += CGFloat(76 * scale)
+                    node.position = nextNodePosition
+                    shipNode.nodes.append(node)
+                }
+            }
+            node = SKSpriteNode(imageNamed: "shipPreviewRight")
+            nextNodePosition.x += CGFloat(76 * scale)
+            shipNode.nodes.append(node)
+            node.position = nextNodePosition
+            //let ship = SKSpriteNode()
+            for node in shipNode.nodes {
+                node.setScale(scale)
+                addChild(node)
+            }
+            lastLength = ship.length
+            // Lücke zum nächsten Schiff
+            nextShipPosition.x = nextNodePosition.x + CGFloat((nodeHeight + nodeHeight/4) * scale)
+        }
+    }
+    
 }

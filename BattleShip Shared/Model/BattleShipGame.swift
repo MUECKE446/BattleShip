@@ -14,7 +14,7 @@ let kGridSize = 12
 
 // MARK: globale Variablen
 
-let numberOfShips       = [0,1,2,2,2,1,1]   // einer,zweier, .. siebener; shipLenghts ist immer index+1
+let numberOfShips       = [0,1,2,2,2,2,1]   // einer,zweier, .. siebener; shipLenghts ist immer index+1
 let numberOfShipsFields = [1,2,3,4,5,6,7]   // Schiffslängen
 
 

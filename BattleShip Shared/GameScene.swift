@@ -25,6 +25,21 @@ class GameScene : SKScene {
     var panGestureRecognizer = UIPanGestureRecognizer()
     #endif
     
+//    var playFieldNode: SKSpriteNode {
+//        get {
+//            var tmpNode = SKSpriteNode()
+//            for node in self.children {
+//                if node.name != nil {
+//                    if node.name == "PlayField" {
+//                        tmpNode = node as! SKSpriteNode
+//                        break
+//                    }
+//                }
+//            }
+//            return tmpNode
+//        }
+//    }
+    
     override func didMove(to view: SKView) {
         /* Setup your scene here */
 //        #if os(iOS)
@@ -49,7 +64,7 @@ class GameScene : SKScene {
         // Design für iPad
         if UIDevice.current.userInterfaceIdiom == .pad {
             let playFieldRect = playField.calculateAccumulatedFrame()
-            playField.position = CGPoint(x: sceneCenter.x-playFieldRect.size.width/2-playFieldRect.origin.x, y: sceneCenter.y-playFieldRect.size.height/2-playFieldRect.origin.y)
+            playField.position = CGPoint(x: sceneCenter.x-playFieldRect.size.width/2-playFieldRect.origin.x, y: self.size.height * 0.9 - playFieldRect.size.height - playFieldRect.origin.y)
         }
 
         // Design für iPhone
