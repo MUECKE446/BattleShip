@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C2AA92621C019010052BFE3 /* GameScene+EventHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2AA92521C019010052BFE3 /* GameScene+EventHandling.swift */; };
+		4C2AA92721C019010052BFE3 /* GameScene+EventHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2AA92521C019010052BFE3 /* GameScene+EventHandling.swift */; };
 		4C59D24A21B6A711008C9993 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C59D24921B6A711008C9993 /* AppDelegate.swift */; };
 		4C59D24F21B6A711008C9993 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C59D24D21B6A711008C9993 /* Main.storyboard */; };
 		4C59D25221B6A711008C9993 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4C59D25021B6A711008C9993 /* LaunchScreen.storyboard */; };
@@ -53,6 +55,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4C2AA92521C019010052BFE3 /* GameScene+EventHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameScene+EventHandling.swift"; sourceTree = "<group>"; };
 		4C59D23E21B6A70F008C9993 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
 		4C59D23F21B6A70F008C9993 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		4C59D24021B6A70F008C9993 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -123,6 +126,7 @@
 				4C59D24021B6A70F008C9993 /* GameScene.swift */,
 				4C8FA4E621B8750D0012A858 /* JKGame.swift */,
 				4C59D29D21B6ACC0008C9993 /* GameScene+PlayField.swift */,
+				4C2AA92521C019010052BFE3 /* GameScene+EventHandling.swift */,
 				4C59D24121B6A711008C9993 /* Assets.xcassets */,
 			);
 			path = "BattleShip Shared";
@@ -305,6 +309,7 @@
 				4C59D28321B6AB57008C9993 /* Int+Extensions.swift in Sources */,
 				4C59D28D21B6AB57008C9993 /* CGPoint+Extensions.swift in Sources */,
 				4C59D2A221B6B5AC008C9993 /* BattleShipGame.swift in Sources */,
+				4C2AA92621C019010052BFE3 /* GameScene+EventHandling.swift in Sources */,
 				4C59D28B21B6AB57008C9993 /* SKNode+Extensions.swift in Sources */,
 				4C59D29E21B6ACC0008C9993 /* GameScene+PlayField.swift in Sources */,
 				4C59D24A21B6A711008C9993 /* AppDelegate.swift in Sources */,
@@ -327,6 +332,7 @@
 				4C59D29421B6AB57008C9993 /* Vector3.swift in Sources */,
 				4C59D28821B6AB57008C9993 /* SKAction+Extensions.swift in Sources */,
 				4C59D25D21B6A711008C9993 /* GameViewController.swift in Sources */,
+				4C2AA92721C019010052BFE3 /* GameScene+EventHandling.swift in Sources */,
 				4C59D28421B6AB57008C9993 /* Int+Extensions.swift in Sources */,
 				4C59D28E21B6AB57008C9993 /* CGPoint+Extensions.swift in Sources */,
 				4C59D28C21B6AB57008C9993 /* SKNode+Extensions.swift in Sources */,
