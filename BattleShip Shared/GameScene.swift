@@ -24,31 +24,16 @@ class GameScene : SKScene {
     #if os(iOS)
     var panGestureRecognizer = UIPanGestureRecognizer()
     #endif
-    
-//    var playFieldNode: SKSpriteNode {
-//        get {
-//            var tmpNode = SKSpriteNode()
-//            for node in self.children {
-//                if node.name != nil {
-//                    if node.name == "PlayField" {
-//                        tmpNode = node as! SKSpriteNode
-//                        break
-//                    }
-//                }
-//            }
-//            return tmpNode
-//        }
-//    }
-    
+        
     override func didMove(to view: SKView) {
         /* Setup your scene here */
-//        #if os(iOS)
-//        panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanFrom(recognizer:)))
-//        self.view!.addGestureRecognizer(panGestureRecognizer)
-//
-//        // mehrere Finger will ich ausschließen
-//        self.view?.isMultipleTouchEnabled = false
-//        #endif
+        #if os(iOS)
+        panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanFrom(recognizer:)))
+        self.view!.addGestureRecognizer(panGestureRecognizer)
+
+        // mehrere Finger will ich ausschließen
+        self.view?.isMultipleTouchEnabled = false
+        #endif
         
         backgroundColor = SKColor.gray
         
@@ -75,7 +60,7 @@ class GameScene : SKScene {
                 playField.setScale(scaleFactor)
                 playFieldRect = playField.calculateAccumulatedFrame()
             }
-            playField.position = CGPoint(x: sceneCenter.x-playFieldRect.size.width/2-playFieldRect.origin.x, y: sceneCenter.y-playFieldRect.size.height/2-playFieldRect.origin.y)
+            playField.position = CGPoint(x: sceneCenter.x-playFieldRect.size.width/2-playFieldRect.origin.x, y: self.size.height * 0.9 - playFieldRect.size.height - playFieldRect.origin.y)
         }
 
         #endif

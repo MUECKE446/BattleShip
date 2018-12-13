@@ -250,4 +250,14 @@ extension GameScene {
         }
     }
     
+    // zeige zufällig n belegte Felder
+    func showRandomUsedShipFields(game:BattleShipGame, numberOfFields:Int) {
+        for i in 0..<numberOfFields {
+            // suche ein Schiff
+            let s = Int.random(0..<game.ships.count)
+            let ship = game.ships[s]
+            let f = Int.random(1..<ship.length)
+        }
+    }
+    
 }
