@@ -42,8 +42,20 @@ class GameViewController: UIViewController {
         battleShipGame.createGame()
         activityIndicator.stopAnimating()
         scene!.showOccupiedFieldsInRowsAndColumns(game: battleShipGame)
-        scene!.showShipsInPlayField(game: battleShipGame)
+        //scene!.showShipsInPlayField(game: battleShipGame)
         scene!.showUsedShipsInGame(battleShipGame)
+        scene!.createGamePlayFieldWorkingLayer(battleShipGame)
+        
+        /*
+        let wait = SKAction.wait(forDuration: 2.0)
+        let fadeOut = SKAction.fadeOut(withDuration: 2.0)
+        let fadeIn = SKAction.fadeIn(withDuration: 2.0)
+        let hide = SKAction.hide()
+        let sequenceAction = SKAction.sequence([fadeOut,wait,fadeIn,wait])
+        let repeatAction = SKAction.repeat(sequenceAction, count: 10)
+        scene!.gamePlayFieldLayer1.isHidden = false
+        scene!.gamePlayFieldLayer1.run(repeatAction)
+         */
         
     }
 
