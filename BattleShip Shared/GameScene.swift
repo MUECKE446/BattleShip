@@ -10,10 +10,13 @@ import SpriteKit
 
 class GameScene : SKScene {
     
+    var gamePlayField : SKTileMapNode!
+    var gamePlayFieldLayer1 : SKTileMapNode!
+    var gamePlayFieldLayer2 : SKTileMapNode!
+
+    var gamePlayFieldPosition = CGPoint.zero
     
-    var sceneCenter = CGPoint.zero
     
-    var playField = SKSpriteNode()
     var gridSize = 0
 
     // Aktions
@@ -41,41 +44,62 @@ class GameScene : SKScene {
     }
     
     func createStartScene() {
-        playField = createPlayField(gridSize: gridSize, withNumberLabels: true)
-        // das ist der Mittelpunkt der Scene
-        sceneCenter = CGPoint(x: self.size.width/2, y: self.size.height/2)
+        //let bundlePath = Bundle.main.path(forResource: "PlayFieldTileSet", ofType: "sks")
+        let playFieldTileSet = SKTileSet(named: "PlayField")
+        gamePlayField = SKTileMapNode(tileSet: playFieldTileSet!, columns: gridSize, rows: gridSize, tileSize: CGSize(width: 80, height: 80))
+        gamePlayField.name = "PlayField"
+        let tileGroups = playFieldTileSet!.tileGroups
+        let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
+//        let waterTile = tileGroups.first(where: {$0.name == "Water"})
+//        let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
+//        let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
+//        let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
+//        let shipUpTile = tileGroups.first(where: {$0.name == "ShipUp"})
+//        let shipDownTile = tileGroups.first(where: {$0.name == "ShipDown"})
+        
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
+                gamePlayField.setTileGroup(emptyFieldTile, forColumn: col, row: row)
+            }
+        }
+        gamePlayField.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+
+        addNumberLabels()
+        calculateGamePlayFieldPosition()
+        gamePlayField.position = gamePlayFieldPosition
+        
+        addChild(gamePlayField)
+    }
+    
+    func calculateGamePlayFieldPosition() {
+        //let sceneCenter = CGPoint(x: JKGame.rect.size.width/2, y: JKGame.rect.size.height/2)
+        let sceneCenter = CGPoint(x: size.width/2, y: size.height/2)
+        var gamePlayFieldRect = gamePlayField.calculateAccumulatedFrame()
         
         #if os(iOS)
         // Design für iPad
         if UIDevice.current.userInterfaceIdiom == .pad {
-            let playFieldRect = playField.calculateAccumulatedFrame()
-            playField.position = CGPoint(x: sceneCenter.x-playFieldRect.size.width/2-playFieldRect.origin.x, y: self.size.height * 0.9 - playFieldRect.size.height - playFieldRect.origin.y)
+            gamePlayFieldPosition = CGPoint(x: sceneCenter.x + gamePlayField.tileSize.width/2, y: sceneCenter.y + gamePlayFieldRect.size.height/2 - gamePlayField.tileSize.height - 20)
         }
-
+        
         // Design für iPhone
         if UIDevice.current.userInterfaceIdiom == .phone {
-            var playFieldRect = playField.calculateAccumulatedFrame()
-            if playFieldRect.size.width > JKGame.rect.size.width {
-                let scaleFactor = JKGame.rect.size.width/playFieldRect.size.width
-                playField.setScale(scaleFactor)
-                playFieldRect = playField.calculateAccumulatedFrame()
+            var scaleFactor:CGFloat = 1.0
+            while gamePlayFieldRect.size.width > JKGame.rect.size.width
+            {
+                scaleFactor -= 0.075
+                gamePlayField.setScale(scaleFactor)
+                gamePlayFieldRect = gamePlayField.calculateAccumulatedFrame()
             }
-            playField.position = CGPoint(x: sceneCenter.x-playFieldRect.size.width/2-playFieldRect.origin.x, y: self.size.height * 0.9 - playFieldRect.size.height - playFieldRect.origin.y)
+            gamePlayFieldPosition = CGPoint(x: sceneCenter.x + gamePlayField.tileSize.width/2, y: sceneCenter.y + gamePlayFieldRect.size.height/2 - gamePlayField.tileSize.height - 20)
         }
-
         #endif
         
         #if os(OSX)
-        playField.position = CGPoint(x: sceneCenter.x-playFieldRect.size.width/2+40, y: sceneCenter.y-playFieldRect.size.height/2+40)
+        gamePlayFieldPosition = CGPoint(x: sceneCenter.x + gamePlayField.tileSize.width/2, y: sceneCenter.y + gamePlayFieldRect.size.height/2 - gamePlayField.tileSize.height - 20)
         #endif
-        
-        // Spielfeld hinzufügen
-        self.addChild(playField)
 
-//        JKGame.game.drawBorder(on: self)
     }
-    
-
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered

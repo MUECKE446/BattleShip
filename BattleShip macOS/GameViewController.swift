@@ -12,11 +12,17 @@ import GameplayKit
 
 class GameViewController: NSViewController {
 
+    var scene:GameScene? = nil
+    let battleShipGame = BattleShipGame(gridSize: kGridSize)
+    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let scene = GameScene.newGameScene()
-        
+        JKGame.game.setOrientation(JKOrientation.portrait)
+        scene = GameScene(size: JKGame.size)
+        scene?.gridSize = kGridSize
+
         // Present the scene
         let skView = self.view as! SKView
         skView.presentScene(scene)
@@ -25,6 +31,14 @@ class GameViewController: NSViewController {
         
         skView.showsFPS = true
         skView.showsNodeCount = true
+
+        // erzeuge ein neues Spiel
+        battleShipGame.createGame()
+        scene!.showOccupiedFieldsInRowsAndColumns(game: battleShipGame)
+        scene!.showShipsInPlayField(game: battleShipGame)
+        scene!.showUsedShipsInGame(battleShipGame)
+        
+
     }
 
 }

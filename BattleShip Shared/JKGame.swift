@@ -23,6 +23,7 @@
 import SpriteKit
 import GameKit
 
+
 enum JKOrientation {
     case portrait, landscape
 }
@@ -52,15 +53,21 @@ final class JKGame {
 
 
     // MARK: - Private Properties
+    #if os(iOS)
     fileprivate let deviceWidth: CGFloat = UIScreen.main.bounds.width
     fileprivate let deviceHeight: CGFloat = UIScreen.main.bounds.height
+    #endif
+    #if os(OSX)
+    fileprivate let deviceWidth: CGFloat = NSScreen.main!.frame.width
+    fileprivate let deviceHeight: CGFloat = NSScreen.main!.frame.height
+    #endif
 
     
     // MARK: - Init
     init() {
         setBorder(using: resolution, and: orientation)
     }
-    
+
 
     // MARK: - Public Methods
     func setCustom(resolution: CGSize, and orientation: JKOrientation = JKOrientation.portrait) {

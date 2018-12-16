@@ -9,6 +9,13 @@
 import Foundation
 import SpriteKit
 
+#if os(iOS)
+typealias Color = UIColor
+#endif
+#if os(OSX)
+typealias Color = NSColor
+#endif
+
 struct ShipNode {
     var nodes:[SKSpriteNode] = []
     var lenght = -1
@@ -16,130 +23,101 @@ struct ShipNode {
 
 extension GameScene {
 
-    func createPlayField(gridSize:Int,withNumberLabels:Bool) -> SKSpriteNode {
-        // dies ist das Gitter, in dem gespielt wird
-        // (0,0) oberstes linkes Feld
-        let playField = SKSpriteNode()
-        playField.name = "PlayField"
+    func addNumberLabels() {
+        // tile (0,0) liegt in der unteren linken Ecke
+        let lowerLeftTilePosition = gamePlayField.centerOfTile(atColumn: 0, row: 0)
+        var numberLabelPosition = lowerLeftTilePosition
+        numberLabelPosition.y += (gamePlayField.tileSize.height * CGFloat(gamePlayField.numberOfRows))
         
-        // da der ancorPoint bei default (0.5,0.5) liegt (was der Mittelpunkt der ersten SpriteNode ist) liegt die
-        // untere Ecke bei (-40,-40)
-        var playFieldPosition = CGPoint.zero
-        
-        if withNumberLabels {
-            // es sollen jetzt oben und links noch die Label hinzugefügt werden
-            playFieldPosition.y = CGFloat(gridSize * 76)
-            for j in 0..<gridSize {
-                // oben
-                let numberBackGroundLabel = SKSpriteNode(color: UIColor.lightGray, size: CGSize(width: 80, height: 80))
-                numberBackGroundLabel.position = playFieldPosition
-                playField.addChild(numberBackGroundLabel)
-                let numberLabel = SKLabelNode(text: String(j))
-                numberLabel.fontColor = UIColor.darkText
-                numberLabel.fontName = "Helvetica"
-                numberLabel.fontSize = 28
-                let numberLabelName = "numberLabelUp " + String(j)
-                numberLabel.name = numberLabelName
-                numberLabel.position = playFieldPosition
-                numberLabel.verticalAlignmentMode = .center
-                numberLabel.zPosition = numberBackGroundLabel.zPosition + 1
-                playField.addChild(numberLabel)
-                playFieldPosition.x += 76
-            }
-            playFieldPosition.y = 0
-            playFieldPosition.x = -76
-            for i in 0..<gridSize {
-                // links
-                let numberBackGroundLabel = SKSpriteNode(color: UIColor.lightGray, size: CGSize(width: 80, height: 80))
-                numberBackGroundLabel.position = playFieldPosition
-                playField.addChild(numberBackGroundLabel)
-                let numberLabel = SKLabelNode(text: String((gridSize-1)-i))
-                numberLabel.fontColor = UIColor.darkText
-                numberLabel.fontName = "Helvetica"
-                numberLabel.fontSize = 28
-                let numberLabelName = "numberLabelLeft " + String((gridSize-1)-i)
-                numberLabel.name = numberLabelName
-                numberLabel.position = playFieldPosition
-                numberLabel.verticalAlignmentMode = .center
-                numberLabel.zPosition = numberBackGroundLabel.zPosition + 1
-                playField.addChild(numberLabel)
-                playFieldPosition.y += 76
-            }
+        for j in 0..<gridSize {
+            // oben
+            let numberBackGroundLabel = SKSpriteNode(color: Color.lightGray, size: gamePlayField.tileSize)
+            numberBackGroundLabel.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            numberBackGroundLabel.position = numberLabelPosition
+            gamePlayField.addChild(numberBackGroundLabel)
+            let numberLabel = SKLabelNode(text: String(j))
+            numberLabel.fontColor = Color.black
+            numberLabel.fontName = "Helvetica"
+            numberLabel.fontSize = 28
+            let numberLabelName = "numberLabelUp " + String(j)
+            numberLabel.name = numberLabelName
+            numberLabel.position = numberLabelPosition
+            numberLabel.verticalAlignmentMode = .center
+            numberLabel.zPosition = numberBackGroundLabel.zPosition + 1
+            gamePlayField.addChild(numberLabel)
+            numberLabelPosition.x += gamePlayField.tileSize.width
         }
-        //return playField
-
-        playFieldPosition = CGPoint.zero
-        // ich brauche gridSize Reihen und Spalten
+        numberLabelPosition = lowerLeftTilePosition
+        numberLabelPosition.x -= gamePlayField.tileSize.height
         for i in 0..<gridSize {
-            // dies ist eine Reihe
-            for j in 0..<gridSize {
-                //!!!: beim Namen der Datei kommt es auf Groß/Kleinschreibung an
-                let playFieldPiece = SKSpriteNode(imageNamed: "Gitterfeld_80x80")
-                let pieceName = "playField_part(" + String((gridSize-1)-i) + "," + String(j) + ")"
-                playFieldPiece.name = pieceName
-                playFieldPiece.position = playFieldPosition
-                playField.addChild(playFieldPiece as SKNode)
-                // für den Test die Koordinaten einblenden
-//                let coordinatesText = String((gridSize-1)-i) + "," + String(j)
-//                let coordinateLabel = SKLabelNode(text: coordinatesText)
-//                coordinateLabel.fontColor = UIColor.darkText
-//                coordinateLabel.fontName = "Helvetica"
-//                coordinateLabel.fontSize = 22
-//                coordinateLabel.position = playFieldPosition
-//                coordinateLabel.verticalAlignmentMode = .center
-//                coordinateLabel.zPosition = playFieldPiece.zPosition + 1
-//                playField.addChild(coordinateLabel)
-                // ein Gitterfeld ist 80x80 Pixel groß; die umgebende Umrandung hat eine Linienstärke von 2 Pixeln
-                playFieldPosition.x += 76
-            }
-            playFieldPosition.x = 0
-            playFieldPosition.y += 76
+            // links
+            let numberBackGroundLabel = SKSpriteNode(color: Color.lightGray, size: gamePlayField.tileSize)
+            numberBackGroundLabel.position = numberLabelPosition
+            gamePlayField.addChild(numberBackGroundLabel)
+            let numberLabel = SKLabelNode(text: String(i))
+            numberLabel.fontColor = Color.black
+            numberLabel.fontName = "Helvetica"
+            numberLabel.fontSize = 28
+            let numberLabelName = "numberLabelLeft " + String(i)
+            numberLabel.name = numberLabelName
+            numberLabel.position = numberLabelPosition
+            numberLabel.verticalAlignmentMode = .center
+            numberLabel.zPosition = numberBackGroundLabel.zPosition + 1
+            gamePlayField.addChild(numberLabel)
+            numberLabelPosition.y += gamePlayField.tileSize.height
         }
-        return playField
     }
     
     
     
+    
     func showShipsInPlayField(game:BattleShipGame) {
+        //let bundlePath = Bundle.main.path(forResource: "PlayFieldTileSet", ofType: "sks")
+        let playFieldTileSet = SKTileSet(named: "PlayField")
+        gamePlayFieldLayer1 = SKTileMapNode(tileSet: playFieldTileSet!, columns: gridSize, rows: gridSize, tileSize: CGSize(width: 80, height: 80))
+        gamePlayFieldLayer1.name = "PlayFieldLayer1"
+        let tileGroups = playFieldTileSet!.tileGroups
+        //let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
+        //        let waterTile = tileGroups.first(where: {$0.name == "Water"})
+        let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
+        let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
+        let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
+        let shipUpTile = tileGroups.first(where: {$0.name == "ShipUp"})
+        let shipDownTile = tileGroups.first(where: {$0.name == "ShipDown"})
+        
         for row in 0..<gridSize {
             for col in 0..<gridSize {
-                let pieceName = "playField_part(" + String(row) + "," + String(col) + ")"
                 if game.gameGrid[row][col] {
-                    // ersetze das entsprechende Feld im playField
-                    for node in playField.children {
-                        if let nodeName = node.name {
-                            if nodeName == pieceName {
-                                var shipNode = SKSpriteNode(imageNamed: "shipMiddle")
-                                let ship = game.findShip(row, col)
-                                switch ship.direction {
-                                case .horizontal:
-                                    if row == ship.startFieldIndex.row && col == ship.startFieldIndex.column {
-                                        shipNode = SKSpriteNode(imageNamed: "shipLeft")
-                                    }
-                                    if row == ship.startFieldIndex.row && col == ship.startFieldIndex.column+ship.length-1 {
-                                        shipNode = SKSpriteNode(imageNamed: "shipRight")
-                                    }
-                                    break
-                                case .vertical:
-                                    if col == ship.startFieldIndex.column && row == ship.startFieldIndex.row {
-                                        shipNode = SKSpriteNode(imageNamed: "shipUp")
-                                    }
-                                    if col == ship.startFieldIndex.column && row == ship.startFieldIndex.row+ship.length-1 {
-                                        shipNode = SKSpriteNode(imageNamed: "shipDown")
-                                    }
-                                    break
-                                }
-                                shipNode.name = pieceName
-                                shipNode.position = node.position
-                                node.removeFromParent()
-                                playField.addChild(shipNode)
-                                break
-                            }
+                    // setze das entsprechende Feld in gamePlayFieldLayer1
+                    let ship = game.findShip(row, col)
+                    
+                    gamePlayFieldLayer1.setTileGroup(shipMiddleTile, forColumn: col, row: row)
+                    switch ship.direction {
+                    case .horizontal:
+                        if row == ship.startFieldIndex.row && col == ship.startFieldIndex.column {
+                            gamePlayFieldLayer1.setTileGroup(shipLeftTile, forColumn: col, row: row)
+                        }
+                        if row == ship.startFieldIndex.row && col == ship.startFieldIndex.column+ship.length-1 {
+                            gamePlayFieldLayer1.setTileGroup(shipRightTile, forColumn: col, row: row)
+                        }
+                    case .vertical:
+                        if col == ship.startFieldIndex.column && row == ship.startFieldIndex.row {
+                            gamePlayFieldLayer1.setTileGroup(shipDownTile, forColumn: col, row: row)
+                        }
+                        if col == ship.startFieldIndex.column && row == ship.startFieldIndex.row+ship.length-1 {
+                            gamePlayFieldLayer1.setTileGroup(shipUpTile, forColumn: col, row: row)
                         }
                     }
                 }
             }
         }
+        gamePlayFieldLayer1.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        gamePlayFieldLayer1.zPosition = gamePlayField.zPosition + 1
+        gamePlayFieldLayer1.xScale = gamePlayField.xScale
+        gamePlayFieldLayer1.yScale = gamePlayField.yScale
+        gamePlayFieldLayer1.position = gamePlayFieldPosition
+        addChild(gamePlayFieldLayer1)
+        
     }
     
     func showOccupiedFieldsInRowsAndColumns(game:BattleShipGame) {
@@ -196,7 +174,8 @@ extension GameScene {
     
     func showUsedShipsInGame(_ game:BattleShipGame) {
         var lastLength = game.ships.last?.length
-        var nextShipPosition = playField.position
+        let gamePlayFieldRect = gamePlayField.calculateAccumulatedFrame()
+        var nextShipPosition = CGPoint(x: gamePlayFieldRect.origin.x + gamePlayField.tileSize.width, y: gamePlayFieldRect.origin.y)
         let scale = CGFloat(0.7)
         // Höhe einer Kachel + halbe Höhe
         let testNode = SKSpriteNode(imageNamed: "shipPreviewMiddle")
@@ -206,9 +185,8 @@ extension GameScene {
         // zeige die Schiffe vom größtem zum kleinsten hin
         for ship in game.ships.reversed() {
             var shipNode = ShipNode()
-            let playFieldRect = playField.calculateAccumulatedFrame()
-            if lastLength != ship.length || (nextShipPosition.x + CGFloat(ship.length) * CGFloat(76.0 * scale) > playFieldRect.origin.x + playFieldRect.size.width) {
-                nextShipPosition.x = playField.position.x
+            if lastLength != ship.length || (nextShipPosition.x + CGFloat(ship.length) * CGFloat(76.0 * scale) > gamePlayFieldRect.origin.x + gamePlayFieldRect.size.width) {
+                nextShipPosition.x = gamePlayFieldRect.origin.x + gamePlayField.tileSize.width
                 nextShipPosition.y -= CGFloat((nodeHeight + nodeHeight/4) * scale)
             }
             var nextNodePosition = nextShipPosition
@@ -220,7 +198,7 @@ extension GameScene {
             node.position = nextNodePosition
             // im ersten Node wird die Länge angezeigt
             let numberLabel = SKLabelNode(text: String(ship.length))
-            numberLabel.fontColor = UIColor.darkText
+            numberLabel.fontColor = Color.black
             numberLabel.fontName = "Helvetica"
             numberLabel.fontSize = 28
             numberLabel.verticalAlignmentMode = .center
