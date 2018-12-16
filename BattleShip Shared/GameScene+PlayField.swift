@@ -72,8 +72,6 @@ extension GameScene {
     
     
     func showShipsInPlayField(game:BattleShipGame) {
-        //let bundlePath = Bundle.main.path(forResource: "PlayFieldTileSet", ofType: "sks")
-        let playFieldTileSet = SKTileSet(named: "PlayField")
         gamePlayFieldLayer1 = SKTileMapNode(tileSet: playFieldTileSet!, columns: gridSize, rows: gridSize, tileSize: CGSize(width: 80, height: 80))
         gamePlayFieldLayer1.name = "PlayFieldLayer1"
         let tileGroups = playFieldTileSet!.tileGroups
@@ -116,6 +114,7 @@ extension GameScene {
         gamePlayFieldLayer1.xScale = gamePlayField.xScale
         gamePlayFieldLayer1.yScale = gamePlayField.yScale
         gamePlayFieldLayer1.position = gamePlayFieldPosition
+        gamePlayFieldLayer1.isHidden = true
         addChild(gamePlayFieldLayer1)
         
     }
@@ -230,12 +229,57 @@ extension GameScene {
     
     // zeige zufällig n belegte Felder
     func showRandomUsedShipFields(game:BattleShipGame, numberOfFields:Int) {
-        for i in 0..<numberOfFields {
+        let tileGroups = playFieldTileSet!.tileGroups
+        //let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
+        //        let waterTile = tileGroups.first(where: {$0.name == "Water"})
+        let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
+        let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
+        let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
+        let shipUpTile = tileGroups.first(where: {$0.name == "ShipUp"})
+        let shipDownTile = tileGroups.first(where: {$0.name == "ShipDown"})
+        
+
+        for _ in 0..<numberOfFields {
             // suche ein Schiff
+            var index = (row:-1,column:-1)
+            
             let s = Int.random(0..<game.ships.count)
             let ship = game.ships[s]
-            let f = Int.random(1..<ship.length)
+            let f = Int.random(0..<ship.length)
+            switch ship.direction {
+            case .horizontal:
+                index = (row:ship.startFieldIndex.row,column:ship.startFieldIndex.column+f)
+                gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: index.column, row: index.row)
+                if index.column == ship.startFieldIndex.column {
+                    gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                }
+                if index.column == ship.startFieldIndex.column+ship.length-1 {
+                    gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                }
+            case .vertical:
+                index = (row:ship.startFieldIndex.row+f,column:ship.startFieldIndex.column)
+                gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: index.column, row: index.row)
+                if index.row == ship.startFieldIndex.row {
+                    gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                }
+                if index.row == ship.startFieldIndex.row+ship.length-1 {
+                    gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                }
+            }
+            securedFields.append((column: index.column,row:index.row))
         }
+    }
+    
+    func createGamePlayFieldWorkingLayer(_ game:BattleShipGame) {
+        gamePlayFieldLayer2 = SKTileMapNode(tileSet: playFieldTileSet!, columns: gridSize, rows: gridSize, tileSize: CGSize(width: 80, height: 80))
+        gamePlayFieldLayer2.name = "PlayFieldLayer2"
+        showRandomUsedShipFields(game: game, numberOfFields: Int.random(in: 4...6))
+        gamePlayFieldLayer2.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        gamePlayFieldLayer2.zPosition = gamePlayField.zPosition + 1
+        gamePlayFieldLayer2.xScale = gamePlayField.xScale
+        gamePlayFieldLayer2.yScale = gamePlayField.yScale
+        gamePlayFieldLayer2.position = gamePlayFieldPosition
+        addChild(gamePlayFieldLayer2)
     }
     
 }

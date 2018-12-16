@@ -10,15 +10,19 @@ import SpriteKit
 
 class GameScene : SKScene {
     
+    
+    let playFieldTileSet = SKTileSet(named: "PlayField")
+
     var gamePlayField : SKTileMapNode!
     var gamePlayFieldLayer1 : SKTileMapNode!
     var gamePlayFieldLayer2 : SKTileMapNode!
 
     var gamePlayFieldPosition = CGPoint.zero
     
-    
     var gridSize = 0
 
+    var securedFields:[(column:Int,row:Int)] = []
+    
     // Aktions
     var sequenceAction = SKAction()
     
@@ -44,8 +48,7 @@ class GameScene : SKScene {
     }
     
     func createStartScene() {
-        //let bundlePath = Bundle.main.path(forResource: "PlayFieldTileSet", ofType: "sks")
-        let playFieldTileSet = SKTileSet(named: "PlayField")
+        //let playFieldTileSet = SKTileSet(named: "PlayField")
         gamePlayField = SKTileMapNode(tileSet: playFieldTileSet!, columns: gridSize, rows: gridSize, tileSize: CGSize(width: 80, height: 80))
         gamePlayField.name = "PlayField"
         let tileGroups = playFieldTileSet!.tileGroups
@@ -72,7 +75,6 @@ class GameScene : SKScene {
     }
     
     func calculateGamePlayFieldPosition() {
-        //let sceneCenter = CGPoint(x: JKGame.rect.size.width/2, y: JKGame.rect.size.height/2)
         let sceneCenter = CGPoint(x: size.width/2, y: size.height/2)
         var gamePlayFieldRect = gamePlayField.calculateAccumulatedFrame()
         
