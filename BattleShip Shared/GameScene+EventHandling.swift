@@ -54,6 +54,15 @@ import SpriteKit
             
             let column = gamePlayFieldLayer2.tileColumnIndex(fromPosition: location)
             let row = gamePlayFieldLayer2.tileRowIndex(fromPosition: location)
+            if row < 0 || row >= gridSize || column < 0 || column >= gridSize {
+                // es wurde ausserhalb des Spielfeldes getippt
+                if column >= gridSize {
+                    gamePlayFieldLayer1.isHidden = !gamePlayFieldLayer1.isHidden
+                }
+                if column < 0 {
+                    viewController.viewDidLoad()
+                }
+            }
             func findFunction(index:(column:Int,row:Int)) -> Bool {
                 return (column:column,row:row) == index
             }
@@ -61,16 +70,18 @@ import SpriteKit
                 return
             }
             if let tile = gamePlayFieldLayer2.tileDefinition(atColumn: column, row: row) {
-                if tile.name!.contains("ship") {
+                if tile.name!.contains("Ship") {
                     gamePlayFieldLayer2.setTileGroup(nil, forColumn: column, row: row)
                 }
-                if tile.name == "water" {
+                if tile.name == "Water" {
                     gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: column, row: row)
                 }
             } else {
                 // Feld ist leer
                 gamePlayFieldLayer2.setTileGroup(waterTile, forColumn: column, row: row)
             }
+            // changeShipFieldsIfNeeded
+            //changeShipFieldsIfNeeded()
         }
         
         override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

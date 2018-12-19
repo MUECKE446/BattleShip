@@ -10,6 +10,7 @@ import SpriteKit
 
 class GameScene : SKScene {
     
+    var viewController : GameViewController!
     
     let playFieldTileSet = SKTileSet(named: "PlayField")
 
