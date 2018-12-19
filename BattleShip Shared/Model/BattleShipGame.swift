@@ -65,6 +65,8 @@ class BattleShipGame {
     
     // versucht ein Spiel zu erzeugen
     func createGame() {
+        occupiedFieldsInColumns = []
+        occupiedFieldsInRows = []
         createShips()
         // solange versuchen, bis es klappt
         while !setShipsToGameGrid() {
@@ -77,7 +79,7 @@ class BattleShipGame {
         var tmpField = Array(repeating: Array(repeating: true, count: gridSize), count: gridSize)
         for row in 0..<gridSize {
             for col in 0..<gridSize {
-                // alle berlegten Felder aus notSuitableFieldsGrid sind verbrannt
+                // alle belegten Felder aus notSuitableFieldsGrid sind verbrannt
                 if notSuitableFieldsGrid[row][col] {
                     tmpField[row][col] = false
                 }
@@ -156,6 +158,7 @@ class BattleShipGame {
     
     func createShips() {
         // Erzeuge die Schiffe
+        ships.removeAll()
         for (index,value) in numberOfShips.enumerated() {
             if value > 0 {
                 for _ in 1...value {

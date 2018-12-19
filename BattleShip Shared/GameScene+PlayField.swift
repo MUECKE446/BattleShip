@@ -119,9 +119,20 @@ extension GameScene {
         
     }
     
+    func isMirrorOfGameGrid(game:BattleShipGame) {
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
+                if game.gameGrid[row][col] {
+                    let tile = gamePlayFieldLayer1.tileGroup(atColumn: col, row: row)
+                    assert((tile?.name?.contains("Ship"))!)
+                }
+            }
+        }
+    }
+    
     func showOccupiedFieldsInRowsAndColumns(game:BattleShipGame) {
         var found = false
-        for i in 0..<game.gridSize {
+        for i in 0..<gridSize {
             // finde numberLabel
             found = false
             for node in self.children {
@@ -145,7 +156,7 @@ extension GameScene {
                 }
             }
         }
-        for i in 0..<game.gridSize {
+        for i in 0..<gridSize {
             // finde numberLabel
             found = false
             for node in self.children {
@@ -229,44 +240,219 @@ extension GameScene {
     
     // zeige zufällig n belegte Felder
     func showRandomUsedShipFields(game:BattleShipGame, numberOfFields:Int) {
+        securedFields = []
         let tileGroups = playFieldTileSet!.tileGroups
-        //let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
-        //        let waterTile = tileGroups.first(where: {$0.name == "Water"})
+        let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
+        //let waterTile = tileGroups.first(where: {$0.name == "Water"})
         let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
         let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
         let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
         let shipUpTile = tileGroups.first(where: {$0.name == "ShipUp"})
         let shipDownTile = tileGroups.first(where: {$0.name == "ShipDown"})
         
-
         for _ in 0..<numberOfFields {
             // suche ein Schiff
             var index = (row:-1,column:-1)
+            var ship = Ship(length: 0)
+            var s = -1, f = -1
+            var tile = emptyFieldTile
+//            var onceAgain = false
+            repeat {
+                s = Int.random(0..<game.ships.count)
+                ship = game.ships[s]
+//                switch ship.direction {
+//                case .horizontal:
+//                    for c in 0..<ship.length {
+//                        assert(game.gameGrid[ship.startFieldIndex.row][ship.startFieldIndex.column+c])
+//                    }
+//                case .vertical:
+//                    for r in 0..<ship.length {
+//                        assert(game.gameGrid[ship.startFieldIndex.row+r][ship.startFieldIndex.column])
+//                    }
+//                }
+                f = Int.random(0..<ship.length)
+                tile = shipMiddleTile
+                switch ship.direction {
+                case .horizontal:
+                    index = (row:ship.startFieldIndex.row,column:ship.startFieldIndex.column+f)
+                    assert(game.gameGrid[index.row][index.column], "das ist nicht fair")
+                    if index.column == ship.startFieldIndex.column {
+                        tile = shipLeftTile
+                    }
+                    if index.column == ship.startFieldIndex.column+ship.length-1 {
+                        tile = shipRightTile
+                    }
+                case .vertical:
+                    index = (row:ship.startFieldIndex.row+f,column:ship.startFieldIndex.column)
+                    assert(game.gameGrid[index.row][index.column], "das ist nicht fair")
+                    if index.row == ship.startFieldIndex.row {
+                        tile = shipDownTile
+                    }
+                    if index.row == ship.startFieldIndex.row+ship.length-1 {
+                        tile = shipUpTile
+                        gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                    }
+                }
+//                if securedFields.contains(where: {(tileIndex:(column:Int,row:Int)) in index == tileIndex}) {
+//                    onceAgain = true
+//                }
+//                else {
+//                    onceAgain = false
+//                }
+            } while securedFields.contains(where: {(tileIndex:(column:Int,row:Int)) in index == tileIndex})
             
-            let s = Int.random(0..<game.ships.count)
-            let ship = game.ships[s]
-            let f = Int.random(0..<ship.length)
-            switch ship.direction {
-            case .horizontal:
-                index = (row:ship.startFieldIndex.row,column:ship.startFieldIndex.column+f)
-                gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: index.column, row: index.row)
-                if index.column == ship.startFieldIndex.column {
-                    gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
-                }
-                if index.column == ship.startFieldIndex.column+ship.length-1 {
-                    gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
-                }
-            case .vertical:
-                index = (row:ship.startFieldIndex.row+f,column:ship.startFieldIndex.column)
-                gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: index.column, row: index.row)
-                if index.row == ship.startFieldIndex.row {
-                    gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
-                }
-                if index.row == ship.startFieldIndex.row+ship.length-1 {
-                    gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+            gamePlayFieldLayer2.setTileGroup(tile, forColumn: index.column, row: index.row)
+            securedFields.append((column: index.column,row:index.row))
+        }
+        // zeige jetzt alle sicher identifizierbaren Felder drumrum
+        showAllFieldsAroundSecuredFields()
+        // zeige alle Reihen,Spalten in denen kein Feld belegt ist
+        showAllFieldsInZeroRowsOrColumns(game: game)
+        
+    }
+    
+    func showAllFieldsAroundSecuredFields() {
+        // zeige jetzt alle sicher identifizierbaren Felder drumrum
+        let tileGroups = playFieldTileSet!.tileGroups
+        let waterTile = tileGroups.first(where: {$0.name == "Water"})
+        var fieldsToShow:[FieldIndex] = []
+        for securedField in securedFields {
+            let field = (row:securedField.row,column:securedField.column)
+            let tile = gamePlayFieldLayer2.tileDefinition(atColumn: securedField.column, row: securedField.row)
+            fieldsToShow.append(contentsOf: getAllFieldsAround(fieldIndex: field, tile: tile!))
+        }
+        for index in fieldsToShow {
+            gamePlayFieldLayer2.setTileGroup(waterTile, forColumn: index.column, row: index.row)
+            
+        }
+
+    }
+    
+    func getAllFieldsAround(fieldIndex:FieldIndex,tile:SKTileDefinition) -> [FieldIndex] {
+        var tmpFieldIndizes:[FieldIndex] = []
+        var rowStart = -1, rowEnd = -1, columnStart = -1, columnEnd = -1
+        rowStart = fieldIndex.row; rowEnd = fieldIndex.row; columnStart = fieldIndex.column; columnEnd = fieldIndex.column
+        
+        switch tile.name {
+        case "ShipMiddle":
+            rowStart != 0 ? rowStart -= 1 : nil
+            rowEnd != gridSize-1 ? rowEnd += 1 : nil
+            if fieldIndex.row == 0 || fieldIndex.row == gridSize - 1  {
+                columnStart != 0 ? columnStart -= 1 : nil
+                columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            }
+            columnStart != 0 ? columnStart -= 1 : nil
+            columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            if fieldIndex.column == 0 || fieldIndex.column == gridSize - 1  {
+                rowStart != 0 ? rowStart -= 1 : nil
+                rowEnd != gridSize-1 ? rowEnd += 1 : nil
+            }
+            for r in rowStart...rowEnd {
+                for c in columnStart...columnEnd {
+                    // ausgeschlossene Felder:
+                    // das Feld selbst; rechts und links daneben und oben und unten daneben, wenn das Feld nicht am Rand liegt
+                    if  (c == fieldIndex.column && r == fieldIndex.row) ||
+                        (r == fieldIndex.row && (fieldIndex.column != 0 && fieldIndex.column != gridSize-1)) ||
+                        (c == fieldIndex.column && (fieldIndex.row != 0 && fieldIndex.row != gridSize - 1)) {
+                    continue
+                    }
+                    tmpFieldIndizes.append((row: r,column: c))
                 }
             }
-            securedFields.append((column: index.column,row:index.row))
+        case "ShipLeft":
+            rowStart != 0 ? rowStart -= 1 : nil
+            rowEnd != gridSize-1 ? rowEnd += 1 : nil
+            columnStart != 0 ? columnStart -= 1 : nil
+            columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            for r in rowStart...rowEnd {
+                for c in columnStart...columnEnd {
+                    if r == fieldIndex.row && c >= fieldIndex.column {
+                        continue
+                    }
+                    tmpFieldIndizes.append((row: r,column: c))
+                }
+            }
+        case "ShipRight":
+            rowStart != 0 ? rowStart -= 1 : nil
+            rowEnd != gridSize-1 ? rowEnd += 1 : nil
+            columnStart != 0 ? columnStart -= 1 : nil
+            columnStart != 0 ? columnStart -= 1 : nil
+            columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            for r in rowStart...rowEnd {
+                for c in columnStart...columnEnd {
+                    if r == fieldIndex.row && c <= fieldIndex.column {
+                        continue
+                    }
+                    tmpFieldIndizes.append((row: r,column: c))
+                }
+            }
+        case "ShipDown":
+            rowStart != 0 ? rowStart -= 1 : nil
+            rowEnd != gridSize-1 ? rowEnd += 1 : nil
+            rowEnd != gridSize-1 ? rowEnd += 1 : nil
+            columnStart != 0 ? columnStart -= 1 : nil
+            columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            for r in rowStart...rowEnd {
+                for c in columnStart...columnEnd {
+                    if r >= fieldIndex.row && c == fieldIndex.column {
+                        continue
+                    }
+                    tmpFieldIndizes.append((row: r,column: c))
+                }
+            }
+        case "ShipUp":
+            rowStart != 0 ? rowStart -= 1 : nil
+            rowStart != 0 ? rowStart -= 1 : nil
+            rowEnd != gridSize-1 ? rowEnd += 1 : nil
+            columnStart != 0 ? columnStart -= 1 : nil
+            columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            for r in rowStart...rowEnd {
+                for c in columnStart...columnEnd {
+                    if r <= fieldIndex.row && c == fieldIndex.column {
+                        continue
+                    }
+                    tmpFieldIndizes.append((row: r,column: c))
+                }
+            }
+        default:
+            fatalError("darf nicht sein")
+            break
+        }
+        
+        // die möglichen Felder sind jetzt eingegrenzt oder auch nicht
+        return tmpFieldIndizes
+    }
+    
+    func showAllFieldsInZeroRowsOrColumns(game:BattleShipGame) {
+        let tileGroups = playFieldTileSet!.tileGroups
+        let waterTile = tileGroups.first(where: {$0.name == "Water"})
+        var fieldsToShow:[FieldIndex] = []
+        for row in 0..<gridSize {
+            if game.occupiedFieldsInRows[row] == 0 {
+                for c in 0..<gridSize {
+                    let fieldIndex = (row:row,column:c)
+                    if gamePlayFieldLayer2.tileDefinition(atColumn: c, row: row)?.name == "Water" {
+                        continue
+                    }
+                    fieldsToShow.append(fieldIndex)
+                }
+            }
+        }
+        for col in 0..<gridSize {
+            if game.occupiedFieldsInColumns[col] == 0 {
+                for r in 0..<gridSize {
+                    let fieldIndex = (row:r,column:col)
+                    if gamePlayFieldLayer2.tileDefinition(atColumn: col, row: r)?.name == "Water" {
+                        continue
+                    }
+                    fieldsToShow.append(fieldIndex)
+                }
+            }
+        }
+        for index in fieldsToShow {
+            gamePlayFieldLayer2.setTileGroup(waterTile, forColumn: index.column, row: index.row)
+            
         }
     }
     
@@ -279,7 +465,67 @@ extension GameScene {
         gamePlayFieldLayer2.xScale = gamePlayField.xScale
         gamePlayFieldLayer2.yScale = gamePlayField.yScale
         gamePlayFieldLayer2.position = gamePlayFieldPosition
+        //gamePlayFieldLayer2.isHidden = true
         addChild(gamePlayFieldLayer2)
     }
     
+    func changeShipFieldsIfNeeded() {
+        let tileGroups = playFieldTileSet!.tileGroups
+        let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
+        let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
+        let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
+        let shipUpTile = tileGroups.first(where: {$0.name == "ShipUp"})
+        let shipDownTile = tileGroups.first(where: {$0.name == "ShipDown"})
+
+        let waterFields:[FieldIndex] = getAllWaterTiles()
+        var rowStart = -1, rowEnd = -1, columnStart = -1, columnEnd = -1
+        for index in waterFields {
+            rowStart = index.row; rowEnd = index.row; columnStart = index.column; columnEnd = index.column
+            rowStart != 0 ? rowStart -= 1 : nil
+            rowEnd != gridSize-1 ? rowEnd += 1 : nil
+            columnStart != 0 ? columnStart -= 1 : nil
+            columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            for r in rowStart...rowEnd {
+                for c in columnStart...columnEnd {
+                    // ausgeschlossene Felder:
+                    if  (c == index.column && r == index.row) ||
+                        (r != index.row && c != index.column) {
+                        continue
+                    }
+                    let tile = gamePlayFieldLayer2.tileDefinition(atColumn: c, row: r)
+                    if let name = tile?.name {
+                    if name.contains("Ship") {
+                        if c < index.column {
+                            gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: c, row: r)
+                        }
+                        if c > index.column {
+                            gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: c, row: r)
+                        }
+                        if r < index.row {
+                            gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: c, row: r)
+                        }
+                        if r > index.row {
+                            gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: c, row: r)
+                        }
+                    }
+                }
+            }
+            }
+        }
+    }
+    
+    func getAllWaterTiles() -> [FieldIndex] {
+        var tmpWaterFields : [FieldIndex] = []
+        
+
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
+                let fieldIndex = (row:row,column:col)
+                if gamePlayFieldLayer2.tileDefinition(atColumn: col, row: row)?.name == "Water" {
+                    tmpWaterFields.append(fieldIndex)
+                }
+            }
+        }
+        return tmpWaterFields
+    }
 }

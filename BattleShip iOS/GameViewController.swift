@@ -23,6 +23,7 @@ class GameViewController: UIViewController {
         // initialisiere die Scene
         JKGame.game.setOrientation(JKOrientation.portrait)
         scene = GameScene(size: JKGame.size)
+        scene!.viewController = self
         scene?.gridSize = kGridSize
         //scene = GameScene(size: CGSize(width: 1536, height: 2048))
         let skView = self.view as! SKView
@@ -42,8 +43,9 @@ class GameViewController: UIViewController {
         battleShipGame.createGame()
         activityIndicator.stopAnimating()
         scene!.showOccupiedFieldsInRowsAndColumns(game: battleShipGame)
-        //scene!.showShipsInPlayField(game: battleShipGame)
-        scene!.showUsedShipsInGame(battleShipGame)
+        scene!.showShipsInPlayField(game: battleShipGame)
+        scene!.isMirrorOfGameGrid(game: battleShipGame)
+        //scene!.showUsedShipsInGame(battleShipGame)
         scene!.createGamePlayFieldWorkingLayer(battleShipGame)
         
         /*
@@ -52,7 +54,7 @@ class GameViewController: UIViewController {
         let fadeIn = SKAction.fadeIn(withDuration: 2.0)
         let hide = SKAction.hide()
         let sequenceAction = SKAction.sequence([fadeOut,wait,fadeIn,wait])
-        let repeatAction = SKAction.repeat(sequenceAction, count: 10)
+        let repeatAction = SKAction.repeat(sequenceAction, count: 3)
         scene!.gamePlayFieldLayer1.isHidden = false
         scene!.gamePlayFieldLayer1.run(repeatAction)
          */
