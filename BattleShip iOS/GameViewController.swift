@@ -45,7 +45,7 @@ class GameViewController: UIViewController {
         scene!.showOccupiedFieldsInRowsAndColumns(game: battleShipGame)
         scene!.showShipsInPlayField(game: battleShipGame)
         scene!.isMirrorOfGameGrid(game: battleShipGame)
-        //scene!.showUsedShipsInGame(battleShipGame)
+        scene!.showUsedShipsInGame(battleShipGame)
         scene!.createGamePlayFieldWorkingLayer(battleShipGame)
         
         /*

@@ -22,7 +22,7 @@ class GameScene : SKScene {
     
     var gridSize = 0
 
-    var securedFields:[(column:Int,row:Int)] = []
+    var securedFields:[FieldIndex] = []
     
     // Aktions
     var sequenceAction = SKAction()
