@@ -293,16 +293,10 @@ extension GameScene {
                         gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
                     }
                 }
-//                if securedFields.contains(where: {(tileIndex:(column:Int,row:Int)) in index == tileIndex}) {
-//                    onceAgain = true
-//                }
-//                else {
-//                    onceAgain = false
-//                }
-            } while securedFields.contains(where: {(tileIndex:(column:Int,row:Int)) in index == tileIndex})
+            } while securedFields.contains(where: {(tileIndex:FieldIndex) in index == tileIndex})
             
             gamePlayFieldLayer2.setTileGroup(tile, forColumn: index.column, row: index.row)
-            securedFields.append((column: index.column,row:index.row))
+            securedFields.append((row:index.row,column: index.column))
         }
         // zeige jetzt alle sicher identifizierbaren Felder drumrum
         showAllFieldsAroundSecuredFields()
@@ -476,56 +470,240 @@ extension GameScene {
         let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
         let shipUpTile = tileGroups.first(where: {$0.name == "ShipUp"})
         let shipDownTile = tileGroups.first(where: {$0.name == "ShipDown"})
-
-        let waterFields:[FieldIndex] = getAllWaterTiles()
+        
+        let shipFields:[FieldIndex] = getAllShipFields()
         var rowStart = -1, rowEnd = -1, columnStart = -1, columnEnd = -1
-        for index in waterFields {
+        for index in shipFields {
             rowStart = index.row; rowEnd = index.row; columnStart = index.column; columnEnd = index.column
             rowStart != 0 ? rowStart -= 1 : nil
             rowEnd != gridSize-1 ? rowEnd += 1 : nil
             columnStart != 0 ? columnStart -= 1 : nil
             columnEnd != gridSize - 1 ? columnEnd += 1 : nil
+            var allWaterFieldsAround:[[Bool]] = Array(repeating: Array(repeating: false, count: 3), count: 3)
+            // securedFields sind ausgeschlossen
+            if securedFields.contains(where: {(fieldIndex:FieldIndex) in index == fieldIndex}) {
+                continue
+            }
             for r in rowStart...rowEnd {
                 for c in columnStart...columnEnd {
-                    // ausgeschlossene Felder:
-                    if  (c == index.column && r == index.row) ||
-                        (r != index.row && c != index.column) {
+                    // ausgeschlossene Felder: nur das Feld selbst
+                    if  (c == index.column && r == index.row) {
                         continue
                     }
                     let tile = gamePlayFieldLayer2.tileDefinition(atColumn: c, row: r)
                     if let name = tile?.name {
-                    if name.contains("Ship") {
-                        if c < index.column {
-                            gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: c, row: r)
-                        }
-                        if c > index.column {
-                            gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: c, row: r)
-                        }
-                        if r < index.row {
-                            gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: c, row: r)
-                        }
-                        if r > index.row {
-                            gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: c, row: r)
+                        if name == "Water" {
+                            allWaterFieldsAround[r-rowStart][c-columnStart] = true
+                            
+                            
                         }
                     }
                 }
             }
+            assert(true)
+            // alle Felder die nicht an irgendeinem Rand liegen
+            if index.column > 0 && index.column < gridSize-1 && index.row > 0 && index.column < gridSize-1 {
+                if allWaterFieldsAround[1][0] && allWaterFieldsAround[0][1] && allWaterFieldsAround[2][1] {
+                    gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                    continue
+                }
+                if allWaterFieldsAround[1][2] && allWaterFieldsAround[0][1] && allWaterFieldsAround[2][1] {
+                    gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                    continue
+                }
+                if allWaterFieldsAround[2][1] && allWaterFieldsAround[1][0] && allWaterFieldsAround[1][2] {
+                    gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                    continue
+                }
+                if allWaterFieldsAround[0][1] && allWaterFieldsAround[1][0] && allWaterFieldsAround[1][2] {
+                    gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                    continue
+                }
             }
+            // alle Felder am linken Rand
+            if index.column == 0 {
+                // alle Felder außer den beiden Ecken
+                if index.row > 0 && index.row < gridSize-1 {
+                    if allWaterFieldsAround[0][0] && allWaterFieldsAround[2][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[2][0] && allWaterFieldsAround[1][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[0][0] && allWaterFieldsAround[1][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+                // die untere linke Ecke
+                if index.row == 0 {
+                    if allWaterFieldsAround[1][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[0][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+                // die obere linke Ecke
+                if index.row == gridSize-1 {
+                    if allWaterFieldsAround[0][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[1][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+            }
+            // alle Felder am rechten Rand
+            if index.column == gridSize-1 {
+                // alle Felder außer den beiden Ecken
+                if index.row > 0 && index.row < gridSize-1 {
+                    if allWaterFieldsAround[0][1] && allWaterFieldsAround[2][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[0][1] && allWaterFieldsAround[1][2] {
+                        gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[0][1] && allWaterFieldsAround[1][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+                // die untere rechte Ecke
+                if index.row == 0 {
+                    if allWaterFieldsAround[1][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[0][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+                // die obere rechte Ecke
+                if index.row == gridSize-1 {
+                    if allWaterFieldsAround[0][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[1][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+            }
+//            if index.column == gridSize-1 {
+//                if allWaterFieldsAround[0][1] && allWaterFieldsAround[2][1] {
+//                    gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+//                    continue
+//                }
+//            }
+            // alle Felder am unteren Rand
+            if index.row == 0 {
+                // alle Felder außer den beiden Ecken
+                if index.column > 0 && index.column < gridSize-1 {
+                    if allWaterFieldsAround[0][0] && allWaterFieldsAround[1][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[2][0] && allWaterFieldsAround[1][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[0][0] && allWaterFieldsAround[0][2] {
+                        gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+                // die untere linke Ecke
+                if index.column == 0 {
+                    if allWaterFieldsAround[0][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[0][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+                // die untere rechte Ecke
+                if index.row == gridSize-1 {
+                    if allWaterFieldsAround[1][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[0][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+            }
+            // alle Felder am oberen Rand
+            if index.row == gridSize-1 {
+                // alle Felder außer den beiden Ecken
+                if index.column > 0 && index.column < gridSize-1 {
+                    if allWaterFieldsAround[1][0] && allWaterFieldsAround[0][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[1][2] && allWaterFieldsAround[0][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[1][0] && allWaterFieldsAround[1][2] {
+                        gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+                // die obere linke Ecke
+                if index.column == 0 {
+                    if allWaterFieldsAround[0][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipLeftTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[1][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipDownTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+                // die obere rechte Ecke
+                if index.column == gridSize-1 {
+                    if allWaterFieldsAround[0][1] {
+                        gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                    if allWaterFieldsAround[1][0] {
+                        gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
+                        continue
+                    }
+                }
+            }
+            gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: index.column, row: index.row)
         }
+        // das Ganze muss wiederholt werden, falls ein WasserFeld wieder zurück in in ein leeres Feld geänderte wurde
     }
     
-    func getAllWaterTiles() -> [FieldIndex] {
-        var tmpWaterFields : [FieldIndex] = []
-        
-
+    func getAllShipFields() -> [FieldIndex] {
+        var tmpShipFields : [FieldIndex] = []
         for row in 0..<gridSize {
             for col in 0..<gridSize {
                 let fieldIndex = (row:row,column:col)
-                if gamePlayFieldLayer2.tileDefinition(atColumn: col, row: row)?.name == "Water" {
-                    tmpWaterFields.append(fieldIndex)
+                if let name = gamePlayFieldLayer2.tileDefinition(atColumn: col, row: row)?.name {
+                    let index = (row:row,column:col)
+                    if !securedFields.contains(where: {(fieldIndex:FieldIndex) in index == fieldIndex}) && name.contains("Ship") {
+                        tmpShipFields.append(fieldIndex)
+                    }
                 }
             }
         }
-        return tmpWaterFields
+        return tmpShipFields
     }
 }

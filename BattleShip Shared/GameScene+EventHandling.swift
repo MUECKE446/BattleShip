@@ -58,13 +58,14 @@ import SpriteKit
                 // es wurde ausserhalb des Spielfeldes getippt
                 if column >= gridSize {
                     gamePlayFieldLayer1.isHidden = !gamePlayFieldLayer1.isHidden
+                    gamePlayFieldLayer2.isHidden = !gamePlayFieldLayer2.isHidden
                 }
                 if column < 0 {
                     viewController.viewDidLoad()
                 }
             }
-            func findFunction(index:(column:Int,row:Int)) -> Bool {
-                return (column:column,row:row) == index
+            func findFunction(index:FieldIndex) -> Bool {
+                return (row:row,column:column) == index
             }
             if securedFields.contains(where: findFunction(index:)) {
                 return
@@ -81,7 +82,7 @@ import SpriteKit
                 gamePlayFieldLayer2.setTileGroup(waterTile, forColumn: column, row: row)
             }
             // changeShipFieldsIfNeeded
-            //changeShipFieldsIfNeeded()
+            changeShipFieldsIfNeeded()
         }
         
         override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
