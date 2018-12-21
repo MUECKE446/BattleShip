@@ -17,6 +17,7 @@ class GameScene : SKScene {
     var gamePlayField : SKTileMapNode!
     var gamePlayFieldLayer1 : SKTileMapNode!
     var gamePlayFieldLayer2 : SKTileMapNode!
+    var gamePlaySecuredFieldsLayer : SKTileMapNode!
 
     var gamePlayFieldPosition = CGPoint.zero
     
@@ -88,7 +89,7 @@ class GameScene : SKScene {
         // Design für iPhone
         if UIDevice.current.userInterfaceIdiom == .phone {
             var scaleFactor:CGFloat = 1.0
-            while gamePlayFieldRect.size.width > JKGame.rect.size.width
+            while gamePlayFieldRect.size.width > UniversalGame.rect.size.width
             {
                 scaleFactor -= 0.075
                 gamePlayField.setScale(scaleFactor)

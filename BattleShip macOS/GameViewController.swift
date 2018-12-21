@@ -19,8 +19,8 @@ class GameViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        JKGame.game.setOrientation(JKOrientation.portrait)
-        scene = GameScene(size: JKGame.size)
+        UniversalGame.game.setOrientation(JKOrientation.portrait)
+        scene = GameScene(size: UniversalGame.size)
         scene?.gridSize = kGridSize
 
         // Present the scene
