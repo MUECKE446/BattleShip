@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Jozemite Apps May 12, 2018
+ * Copyright (c) 2018 Jozemite Apps May 12, 2018 modified by Christian Muth 2018
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,23 @@ import SpriteKit
 import GameKit
 
 
-enum JKOrientation {
+enum UniversalGameOrientation {
     case portrait, landscape
 }
 
 
-final class JKGame {
+final class UniversalGame {
     
     // MARK: - Static Properties
     /// The shared singleton. Default settings are portrait device with 1536x2048 resolution (universal).
-    static var game: JKGame = JKGame()
+    static var game: UniversalGame = UniversalGame()
     /// Convenient property that returns the border.
     static var rect: CGRect {
-        return JKGame.game.border
+        return UniversalGame.game.border
     }
     /// Convenient property that returns the resolution.
     static var size: CGSize {
-        return JKGame.game.resolution
+        return UniversalGame.game.resolution
     }
     
     // MARK: - Public Properties
@@ -49,7 +49,7 @@ final class JKGame {
     /// The resolution of the device's screen as a CGSize object. Default is 1536x2048.
     private(set) var resolution: CGSize = CGSize(width: 1536, height: 2048)
     /// The protrait of the device.
-    private(set) var orientation: JKOrientation = JKOrientation.portrait
+    private(set) var orientation: UniversalGameOrientation = UniversalGameOrientation.portrait
 
 
     // MARK: - Private Properties
@@ -70,13 +70,13 @@ final class JKGame {
 
 
     // MARK: - Public Methods
-    func setCustom(resolution: CGSize, and orientation: JKOrientation = JKOrientation.portrait) {
+    func setCustom(resolution: CGSize, and orientation: UniversalGameOrientation = UniversalGameOrientation.portrait) {
         self.resolution = resolution
         self.orientation = orientation
         setBorder(using: self.resolution, and: self.orientation)
     }
     
-    func setOrientation(_ orientation: JKOrientation) {
+    func setOrientation(_ orientation: UniversalGameOrientation) {
         self.orientation = orientation
         setBorder(using: self.resolution, and: self.orientation)
     }
@@ -91,7 +91,7 @@ final class JKGame {
     
     
     // MARK: - Private Methods
-    private func setBorder(using size: CGSize, and orientation: JKOrientation) {
+    private func setBorder(using size: CGSize, and orientation: UniversalGameOrientation) {
         switch orientation {
         case .landscape:
             let maxAspectRatio = deviceWidth / deviceHeight

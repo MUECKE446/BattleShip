@@ -21,8 +21,8 @@ class GameViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         // initialisiere die Scene
-        JKGame.game.setOrientation(JKOrientation.portrait)
-        scene = GameScene(size: JKGame.size)
+        UniversalGame.game.setOrientation(UniversalGameOrientation.portrait)
+        scene = GameScene(size: UniversalGame.size)
         scene!.viewController = self
         scene?.gridSize = kGridSize
         //scene = GameScene(size: CGSize(width: 1536, height: 2048))

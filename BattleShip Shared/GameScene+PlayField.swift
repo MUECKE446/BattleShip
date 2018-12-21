@@ -77,6 +77,7 @@ extension GameScene {
         let tileGroups = playFieldTileSet!.tileGroups
         //let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
         //        let waterTile = tileGroups.first(where: {$0.name == "Water"})
+        let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
         let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
         let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
         let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
@@ -242,8 +243,10 @@ extension GameScene {
     func showRandomUsedShipFields(game:BattleShipGame, numberOfFields:Int) {
         securedFields = []
         let tileGroups = playFieldTileSet!.tileGroups
+        let blackPointFieldTile = tileGroups.first(where: {$0.name == "BlackPoint"})
         let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
         //let waterTile = tileGroups.first(where: {$0.name == "Water"})
+        let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
         let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
         let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
         let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
@@ -256,20 +259,9 @@ extension GameScene {
             var ship = Ship(length: 0)
             var s = -1, f = -1
             var tile = emptyFieldTile
-//            var onceAgain = false
             repeat {
                 s = Int.random(0..<game.ships.count)
                 ship = game.ships[s]
-//                switch ship.direction {
-//                case .horizontal:
-//                    for c in 0..<ship.length {
-//                        assert(game.gameGrid[ship.startFieldIndex.row][ship.startFieldIndex.column+c])
-//                    }
-//                case .vertical:
-//                    for r in 0..<ship.length {
-//                        assert(game.gameGrid[ship.startFieldIndex.row+r][ship.startFieldIndex.column])
-//                    }
-//                }
                 f = Int.random(0..<ship.length)
                 tile = shipMiddleTile
                 switch ship.direction {
@@ -296,6 +288,7 @@ extension GameScene {
             } while securedFields.contains(where: {(tileIndex:FieldIndex) in index == tileIndex})
             
             gamePlayFieldLayer2.setTileGroup(tile, forColumn: index.column, row: index.row)
+            gamePlaySecuredFieldsLayer.setTileGroup(blackPointFieldTile, forColumn: index.column, row: index.row)
             securedFields.append((row:index.row,column: index.column))
         }
         // zeige jetzt alle sicher identifizierbaren Felder drumrum
@@ -451,6 +444,15 @@ extension GameScene {
     }
     
     func createGamePlayFieldWorkingLayer(_ game:BattleShipGame) {
+        gamePlaySecuredFieldsLayer = SKTileMapNode(tileSet: playFieldTileSet!, columns: gridSize, rows: gridSize, tileSize: CGSize(width: 80, height: 80))
+        gamePlaySecuredFieldsLayer.name = "PlaySecuredFieldsLayer"
+        gamePlaySecuredFieldsLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        gamePlaySecuredFieldsLayer.zPosition = gamePlayField.zPosition + 2
+        gamePlaySecuredFieldsLayer.xScale = gamePlayField.xScale
+        gamePlaySecuredFieldsLayer.yScale = gamePlayField.yScale
+        gamePlaySecuredFieldsLayer.position = gamePlayFieldPosition
+        //gamePlaySecuredFieldsLayer.isHidden = true
+        addChild(gamePlaySecuredFieldsLayer)
         gamePlayFieldLayer2 = SKTileMapNode(tileSet: playFieldTileSet!, columns: gridSize, rows: gridSize, tileSize: CGSize(width: 80, height: 80))
         gamePlayFieldLayer2.name = "PlayFieldLayer2"
         showRandomUsedShipFields(game: game, numberOfFields: Int.random(in: 4...6))
@@ -461,10 +463,12 @@ extension GameScene {
         gamePlayFieldLayer2.position = gamePlayFieldPosition
         //gamePlayFieldLayer2.isHidden = true
         addChild(gamePlayFieldLayer2)
+
     }
     
     func changeShipFieldsIfNeeded() {
         let tileGroups = playFieldTileSet!.tileGroups
+        let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
         let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
         let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
         let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
@@ -568,7 +572,7 @@ extension GameScene {
                         gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
                         continue
                     }
-                    if allWaterFieldsAround[0][1] && allWaterFieldsAround[1][2] {
+                    if allWaterFieldsAround[1][0] && allWaterFieldsAround[2][1] {
                         gamePlayFieldLayer2.setTileGroup(shipUpTile, forColumn: index.column, row: index.row)
                         continue
                     }
@@ -600,12 +604,6 @@ extension GameScene {
                     }
                 }
             }
-//            if index.column == gridSize-1 {
-//                if allWaterFieldsAround[0][1] && allWaterFieldsAround[2][1] {
-//                    gamePlayFieldLayer2.setTileGroup(shipRightTile, forColumn: index.column, row: index.row)
-//                    continue
-//                }
-//            }
             // alle Felder am unteren Rand
             if index.row == 0 {
                 // alle Felder außer den beiden Ecken
@@ -686,7 +684,8 @@ extension GameScene {
                     }
                 }
             }
-            gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: index.column, row: index.row)
+            //gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: index.column, row: index.row)
+            gamePlayFieldLayer2.setTileGroup(shipUndefinedTile, forColumn: index.column, row: index.row)
         }
         // das Ganze muss wiederholt werden, falls ein WasserFeld wieder zurück in in ein leeres Feld geänderte wurde
     }

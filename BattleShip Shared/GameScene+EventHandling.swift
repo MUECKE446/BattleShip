@@ -39,6 +39,7 @@ import SpriteKit
             //Swift.print("touchesBegan",touches.count)
             let tileGroups = playFieldTileSet!.tileGroups
             let waterTile = tileGroups.first(where: {$0.name == "Water"})
+            let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
             let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
             let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
             let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
@@ -59,6 +60,7 @@ import SpriteKit
                 if column >= gridSize {
                     gamePlayFieldLayer1.isHidden = !gamePlayFieldLayer1.isHidden
                     gamePlayFieldLayer2.isHidden = !gamePlayFieldLayer2.isHidden
+                    gamePlaySecuredFieldsLayer.isHidden = !gamePlaySecuredFieldsLayer.isHidden
                 }
                 if column < 0 {
                     viewController.viewDidLoad()
@@ -75,7 +77,7 @@ import SpriteKit
                     gamePlayFieldLayer2.setTileGroup(nil, forColumn: column, row: row)
                 }
                 if tile.name == "Water" {
-                    gamePlayFieldLayer2.setTileGroup(shipMiddleTile, forColumn: column, row: row)
+                    gamePlayFieldLayer2.setTileGroup(shipUndefinedTile, forColumn: column, row: row)
                 }
             } else {
                 // Feld ist leer
