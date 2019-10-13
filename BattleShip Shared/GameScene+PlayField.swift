@@ -77,7 +77,7 @@ extension GameScene {
         let tileGroups = playFieldTileSet!.tileGroups
         //let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
         //        let waterTile = tileGroups.first(where: {$0.name == "Water"})
-        let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
+        //let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
         let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
         let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
         let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
@@ -246,7 +246,7 @@ extension GameScene {
         let blackPointFieldTile = tileGroups.first(where: {$0.name == "BlackPoint"})
         let emptyFieldTile = tileGroups.first(where: {$0.name == "EmptyField"})
         //let waterTile = tileGroups.first(where: {$0.name == "Water"})
-        let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
+        //let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
         let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
         let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
         let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
@@ -469,7 +469,7 @@ extension GameScene {
     func changeShipFieldsIfNeeded() {
         let tileGroups = playFieldTileSet!.tileGroups
         let shipUndefinedTile = tileGroups.first(where: {$0.name == "ShipUndefined"})
-        let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
+        //let shipMiddleTile = tileGroups.first(where: {$0.name == "ShipMiddle"})
         let shipLeftTile = tileGroups.first(where: {$0.name == "ShipLeft"})
         let shipRightTile = tileGroups.first(where: {$0.name == "ShipRight"})
         let shipUpTile = tileGroups.first(where: {$0.name == "ShipUp"})

@@ -111,6 +111,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4C324D8D23524766002C0614 /* SK Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				4C59D23E21B6A70F008C9993 /* Actions.sks */,
+				4C59D23F21B6A70F008C9993 /* GameScene.sks */,
+				4C37B21521C4075E0040958F /* PlayField.sks */,
+			);
+			path = "SK Scenes";
+			sourceTree = "<group>";
+		};
 		4C59D23821B6A70F008C9993 = {
 			isa = PBXGroup;
 			children = (
@@ -124,11 +134,9 @@
 		4C59D23D21B6A70F008C9993 /* BattleShip Shared */ = {
 			isa = PBXGroup;
 			children = (
+				4C324D8D23524766002C0614 /* SK Scenes */,
 				4C59D2A021B6B554008C9993 /* Model */,
 				4C59D27221B6AB57008C9993 /* SKTUtils */,
-				4C59D23E21B6A70F008C9993 /* Actions.sks */,
-				4C59D23F21B6A70F008C9993 /* GameScene.sks */,
-				4C37B21521C4075E0040958F /* PlayField.sks */,
 				4C59D24021B6A70F008C9993 /* GameScene.swift */,
 				4C2E3D9D21CD0C4F00130CA9 /* UniversalGame.swift */,
 				4C59D29D21B6ACC0008C9993 /* GameScene+PlayField.swift */,
@@ -246,9 +254,11 @@
 				TargetAttributes = {
 					4C59D24521B6A711008C9993 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1110;
 					};
 					4C59D25721B6A711008C9993 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1110;
 					};
 				};
 			};
@@ -507,7 +517,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Muecke-Software.BattleShip";
 				PRODUCT_NAME = BattleShip;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -528,7 +538,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Muecke-Software.BattleShip";
 				PRODUCT_NAME = BattleShip;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -551,7 +561,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Muecke-Software.BattleShip";
 				PRODUCT_NAME = BattleShip;
 				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -572,7 +582,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Muecke-Software.BattleShip";
 				PRODUCT_NAME = BattleShip;
 				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

@@ -19,7 +19,7 @@ class GameViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        UniversalGame.game.setOrientation(JKOrientation.portrait)
+        UniversalGame.game.setOrientation(UniversalGameOrientation.portrait)
         scene = GameScene(size: UniversalGame.size)
         scene?.gridSize = kGridSize
 
@@ -36,8 +36,10 @@ class GameViewController: NSViewController {
         battleShipGame.createGame()
         scene!.showOccupiedFieldsInRowsAndColumns(game: battleShipGame)
         scene!.showShipsInPlayField(game: battleShipGame)
+        scene!.isMirrorOfGameGrid(game: battleShipGame)
         scene!.showUsedShipsInGame(battleShipGame)
-        
+        scene!.createGamePlayFieldWorkingLayer(battleShipGame)
+
 
     }
 
